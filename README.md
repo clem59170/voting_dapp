@@ -23,3 +23,9 @@ Lorsque vous déployez le smart contract il se déploie à une adresse particuli
 ### npm start
 
 Dans le répertoire src de l'application react, vous pouvez lancer npm start, si des erreurs de compilations surviennent, c'est surement un problème de dépendance, il faudra insaller les librairies qu'il vous manque avec npm (web3 etc)
+
+### Ce que fait cette app react
+
+Vous pouvez vous y identifier avec metamask, si vous vous identifier avec le compte qui a servi au déploiement du contrat, alors vous serez admin vous aurez l'interface admin, sinon l'interface utilisateur.
+
+L'admin peut ajouter des comptes pour qu'ils deviennent votant. Il peut ensuite lancer une session de propositions. Les votants font de propositions et l'admin décide de quand terminer cette session. Une dois terminée il peut lancer la session de vote, les votants votent pour leur proposition préféré, une fois qu'il ont voté ils sont informés des résulats avec le score de chaque proposition. L'admin lui est informé en temps réel du score de chaque proposition. Il peut ensuite décider de terminer la session de vote.
