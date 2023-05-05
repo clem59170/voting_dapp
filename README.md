@@ -1,70 +1,25 @@
-# Getting Started with Create React App
+# Charger le smart contract sur remix
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Charger ce gist sur remix : https://gist.github.com/clem59170/9934f8868b68b524b32ced44662b3707
+Load from gist et vous copier coller le lien.
 
-## Available Scripts
+# Lancer ganache et y connecter MetaMask
 
-In the project directory, you can run:
+Il faut lancer ganache et y connecter metamask sur le port sur lequel ganache sur lance par défaut 
 
-### `npm start`
+## Compiler Voting.sol
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Sur Remix vous pouvez compiler le smart contract
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Déployer le smart contract
 
-### `npm test`
+Une fois compiler vous pouvez le déployer, en spécifiant utiliser ganache, la vous mettez l'adresse et le port sur lequel ganache est en écoute
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+### Copier l'id du réseau et l'adresse du smart contract
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Lorsque vous déployez le smart contract il se déploie à une adresse particulière, sur remix vous pouvez facilement copier cette adresse, elle se site juste en dessous du bouton déployer. Vous devez coller cette adresse dans le fichier src/contracts/Voting.json à la place de l'adresse qui s'y trouve déjà. Pareil pour l'id du réseau, que vous pouvez trouver aussi sur remix au niveau du choix de l'environnement, normalement il est noté network id {}. Vous devez le copier et le coller a la place de l'id deja présent dans le fichier Voting.json
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### npm start
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Dans le répertoire src de l'application react, vous pouvez lancer npm start, si des erreurs de compilations surviennent, c'est surement un problème de dépendance, il faudra insaller les librairies qu'il vous manque avec npm (web3 etc)
