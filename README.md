@@ -1,8 +1,3 @@
-# Charger le smart contract sur remix
-
-Charger ce gist sur remix : https://gist.github.com/clem59170/9934f8868b68b524b32ced44662b3707
-Load from gist et vous copier coller le lien.
-
 # Application de vote décentralisé
 
 Une application de vote décentralisé construite avec un smart contract Ethereum et un front-end React.
