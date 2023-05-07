@@ -1,4 +1,12 @@
 import React, { useEffect, useState } from "react";
+import Container from 'react-bootstrap/Container';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import ListGroup from 'react-bootstrap/ListGroup';
+import Alert from 'react-bootstrap/Alert';
+import Stack from 'react-bootstrap/Stack';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const VoterPanel = ({ contract, accounts }) => {
     const [isRegistered, setIsRegistered] = useState(false);
@@ -101,72 +109,105 @@ const VoterPanel = ({ contract, accounts }) => {
     }, [contract]);
 
     return (
-        <div>
+        <Container>
             {isRegisteringVoters ? (
                 isRegistered ? (
-                    <h1>Tu es sur la liste, tu vas pouvoir voter</h1>
+                    <Alert variant="success">
+                        Tu es sur la liste, tu vas pouvoir voter
+                    </Alert>
                 ) : (
-                    <h1>Tu n'es pas sur la liste, tu pourras voter si l'admin t'ajoute</h1>
+                    <Alert variant="danger">
+                        Tu n'es pas sur la liste, tu pourras voter si l'admin t'ajoute
+                    </Alert>
                 )
             ) : (
-                <h1></h1>
+                <></>
             )}
             {isRegistered && isProposalSessionStarted && (
-                <div>
-                    <h3>Faire une proposition</h3>
-                    <input type="text" value={proposal} onChange={handleProposalChange} />
-                    <button onClick={submitProposal} disabled={hasFinishedProposals}>Soumettre la proposition</button>
-                    <button onClick={finishProposals} disabled={hasFinishedProposals}>J'ai fini de faire des propositions</button>
-                </div>
+                <Card>
+                    <Card.Header>Faire une proposition</Card.Header>
+                    <Card.Body>
+                        <Stack direction="horizontal" gap={3}>
+                            <Form.Control
+                                type="text"
+                                value={proposal}
+                                onChange={handleProposalChange}
+                            />
+                            <Button
+                                onClick={submitProposal}
+                                disabled={hasFinishedProposals}
+                            >
+                                Soumettre la proposition
+                            </Button>
+                        </Stack>
+                        <Button
+                            onClick={finishProposals}
+                            disabled={hasFinishedProposals}
+                        >
+                            J'ai fini de faire des propositions
+                        </Button>
+                    </Card.Body>
+                </Card>
             )}
             {isRegistered && isVotingSessionStarted && (
-                <div>
-                    <h3>Session de vote en cours</h3>
-                    <h4>Liste des propositions</h4>
-                    <ul>
-                        {proposals.map((proposal, index) => (
-                            <li key={index}>
-                                {proposal.description}{" "}
-                                <button disabled={hasVoted} onClick={() => vote(index)}>Voter pour cette proposition</button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                <Card>
+                    <Card.Header>Session de vote en cours</Card.Header>
+                    <Card.Body>
+                        <Card.Title>Liste des propositions</Card.Title>
+                        <ListGroup>
+                            {proposals.map((proposal, index) => (
+                                <ListGroup.Item key={index}>
+                                    {proposal.description}{" "}
+                                    <Button
+                                        disabled={hasVoted}
+                                        onClick={() => vote(index)}
+                                    >
+                                        Voter pour cette proposition
+                                    </Button>
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </Card.Body>
+                </Card>
             )}
             {hasVoted && (
-                <div>
-                    <h3>Résultats des votes</h3>
-                    <h4>Liste des propositions</h4>
-                    <ul>
-                        {proposals.map((proposal, index) => (
-                            <li key={index}>
-                                {proposal.description} ({proposal.voteCount} votes)
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                <Card>
+                    <Card.Header>Résultats des votes</Card.Header>
+                    <Card.Body>
+                        <Card.Title>Liste des propositions</Card.Title>
+                        <ListGroup>
+                            {proposals.map((proposal, index) => (
+                                <ListGroup.Item key={index}>
+                                    {proposal.description} ({proposal.voteCount} votes)
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </Card.Body>
+                </Card>
             )}
             {isRegistered && isVotingSessionStarted && hasVoted && (
-                <div>
-                    <h3>Session de vote en cours</h3>
-                    <p>Vous avez voté !</p>
-                </div>
+                <Card>
+                    <Card.Header>Session de vote en cours</Card.Header>
+                    <Card.Body>
+                        <Alert variant="success">Vous avez voté !</Alert>
+                    </Card.Body>
+                </Card>
             )}
             {isVotesTallied && (
-                <div>
-                    <h3>Afficher le résultat</h3>
-                    <button onClick={showResult}>Afficher le résultat</button>
-                    {winner && (
-                        <p>
-                            La proposition gagnante est : {winner.description} avec{" "}
-                            {winner.voteCount} votes.
-                        </p>
-                    )}
-                </div>
+                <Card>
+                    <Card.Header>Afficher le résultat</Card.Header>
+                    <Card.Body>
+                        <Button onClick={showResult}>Afficher le résultat</Button>
+                        {winner && (
+                            <p>
+                                La proposition gagnante est : {winner.description} avec{" "}
+                                {winner.voteCount} votes.
+                            </p>
+                        )}
+                    </Card.Body>
+                </Card>
             )}
-
-        </div>
-
+        </Container>
     );
 };
 

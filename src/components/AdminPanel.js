@@ -1,4 +1,13 @@
 import React, {useEffect, useState} from "react";
+import Container from 'react-bootstrap/Container';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import ListGroup from 'react-bootstrap/ListGroup';
+import Alert from 'react-bootstrap/Alert';
+import Stack from 'react-bootstrap/Stack';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const AdminPanel = ({ contract, accounts }) => {
     const [voterAddress, setVoterAddress] = useState("");
@@ -230,86 +239,115 @@ const AdminPanel = ({ contract, accounts }) => {
 
 
     return (
-        <div>
+        <Container>
             <h2>Panel Admin</h2>
-            {isRegisteringVoters && (
-            <div>
-                <h3>Enregistrer un votant</h3>
-                <input type="text" value={voterAddress} onChange={handleVoterAddressChange} />
-                <button onClick={registerVoter}>Enregistrer</button>
-            </div>
-            )}
-            <div>
-                <h3>Liste des votants</h3>
-                <ul>
-                    {voterList.map((address) => (
-                        <li key={address}>
-                            {address}{" "}
-                            {isRegisteringVoters && (
-                                <button onClick={() => removeVoter(address)}>Supprimer</button>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            {voterList.length >= 2 && isRegisteringVoters && !isFetchingVoters && !isProposalSessionStarted && (
-                <div>
-                    <h3>Démarrer une session de de propositions</h3>
-                    <button onClick={startSession}>Démarrer</button>
-                </div>
-            )}
-            {isProposalSessionStarted && (
-                <div>
-                    <h3>Session de proposition en cours</h3>
-                    <h4>Liste des propositions</h4>
-                    <ul>
-                        {proposals.map((proposal, index) => (
-                            <li key={index}>{proposal.description}</li>
+            <Card>
+                <Card.Header>Enregistrer un votant</Card.Header>
+                {isRegisteringVoters && (
+                    <Card.Body>
+                        <Stack direction="horizontal" gap={3}>
+                            <Form.Control
+                                type="text"
+                                value={voterAddress}
+                                onChange={handleVoterAddressChange}
+                            />
+                            <Button onClick={registerVoter}>Enregistrer</Button>
+                        </Stack>
+                    </Card.Body>
+                )}
+
+                <Card.Body>
+                    <Card.Title>Liste des votants</Card.Title>
+                    <ListGroup>
+                        {voterList.map((address) => (
+                            <ListGroup.Item key={address}>
+                                {address}{" "}
+                                {isRegisteringVoters && (
+                                    <Button
+                                        variant="danger"
+                                        onClick={() => removeVoter(address)}
+                                        size="sm"
+                                    >
+                                        Supprimer
+                                    </Button>
+                                )}
+                            </ListGroup.Item>
                         ))}
-                    </ul>
-                    {finishedVoters === voterList.length && (
-                        <p>Tout le monde a fini de faire des propositions !</p>
+                    </ListGroup>
+                </Card.Body>
+                {voterList.length >= 2 &&
+                    isRegisteringVoters &&
+                    !isFetchingVoters &&
+                    !isProposalSessionStarted && (
+                        <Card.Body>
+                            <Card.Title>Démarrer une session de propositions</Card.Title>
+                            <Button onClick={startSession}>Démarrer</Button>
+                        </Card.Body>
                     )}
-                    <button onClick={endSessionWithConfirmation} disabled={proposals.length < 2}>
-                        Terminer la session
-                    </button>
-                </div>
-            )}
-            {isProposalSessionEnded && (
-                <div>
-                    <h3>Ouvrir la session de vote</h3>
-                    <button onClick={startVotingSession}>Ouvrir la session</button>
-                </div>
-            )}
-            {isVotingSessionStarted && (
-                <div>
-                    <h3>Session de vote en cours</h3>
-                    <h4>Liste des propositions</h4>
-                    <ul>
-                        {proposals.map((proposal, index) => (
-                            <li key={index}>
-                                {proposal.description} ({votes[index]} votes){" "}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-            {isVotingSessionStarted && hasEveryoneVoted && (
-                <button onClick={endVotingSession}>Terminer la session de vote</button>
-            )}
-            {isVotesTallied && (
-                <div>
-                    <h3>Afficher le résultat</h3>
-                    <button onClick={showResult}>Afficher le résultat</button>
-                    {winner && (
-                        <p>
-                            La proposition gagnante est : {winner.description} avec{" "}
-                            {winner.voteCount} votes.
-                        </p>
-                    )}
-                </div>
-            )}
-        </div>
+                {isProposalSessionStarted && (
+                    <Card.Body>
+                        <Card.Title>Session de proposition en cours</Card.Title>
+                        <Card.Subtitle className="mb-2">
+                            Liste des propositions
+                        </Card.Subtitle>
+                        <ListGroup>
+                            {proposals.map((proposal, index) => (
+                                <ListGroup.Item key={index}>{proposal.description}</ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                        {finishedVoters === voterList.length && (
+                            <p>Tout le monde a fini de faire des propositions !</p>
+                        )}
+                        <Button
+                            onClick={endSessionWithConfirmation}
+                            disabled={proposals.length < 2}
+                        >
+                            Terminer la session
+                        </Button>
+                    </Card.Body>
+                )}
+                {isProposalSessionEnded && (
+                    <Card.Body>
+                        <Card.Title>Ouvrir la session de vote</Card.Title>
+                        <Button onClick={startVotingSession}>Ouvrir la session</Button>
+                    </Card.Body>
+                )}
+                {isVotingSessionStarted && (
+                    <Card.Body>
+                        <Card.Title>Session de vote en cours</Card.Title>
+                        <Card.Subtitle className="mb-2">
+                            Liste des propositions
+                        </Card.Subtitle>
+                        <ListGroup>
+                            {proposals.map((proposal, index) => (
+                                <ListGroup.Item key={index}>
+                                    {proposal.description} ({votes[index]} votes){" "}
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </Card.Body>
+                )}
+                {isVotingSessionStarted && hasEveryoneVoted && (
+                    <Card.Body>
+                        <Button onClick={endVotingSession}>
+                            Terminer la session de vote
+                        </Button>
+                    </Card.Body>
+                )}
+                {isVotesTallied && (
+                    <Card.Body>
+                        <Card.Title>Afficher le résultat</Card.Title>
+                        <Button onClick={showResult}>Afficher le résultat</Button>
+                        {winner && (
+                            <p>
+                                La proposition gagnante est : {winner.description} avec{" "}
+                                {winner.voteCount} votes.
+                            </p>
+                        )}
+                    </Card.Body>
+                )}
+            </Card>
+        </Container>
     );
 
 
