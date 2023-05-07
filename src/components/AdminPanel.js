@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 const AdminPanel = ({ contract, accounts }) => {
     const [voterAddress, setVoterAddress] = useState("");
     const [voterList, setVoterList] = useState([]);
-    const [isSessionStarted, setIsSessionStarted] = useState(false);
+    const [isProposalSessionStarted, setIsProposalSessionStarted] = useState(false);
     const [isFetchingVoters, setIsFetchingVoters] = useState(false);
     const [proposals, setProposals] = useState([]);
     const [finishedVoters, setFinishedVoters] = useState(0);
@@ -12,7 +12,9 @@ const AdminPanel = ({ contract, accounts }) => {
     const [votes, setVotes] = useState([]);
     const [hasEveryoneVoted, setHasEveryoneVoted] = useState(false);
     const [winner, setWinner] = useState(null);
-
+    const [isVotingSessionEnded, setIsVotingSessionEnded] = useState(false)
+    const [isVotesTallied, setIsVotesTallied] = useState(false)
+    const [isRegisteringVoters, setIsRegisteringVoters] = useState(false)
 
 
 
@@ -66,7 +68,7 @@ const AdminPanel = ({ contract, accounts }) => {
     const startSession = async () => {
         try {
             await contract.methods.startProposalsRegistration().send({ from: accounts[0] });
-            setIsSessionStarted(true);
+            setIsProposalSessionStarted(true);
         } catch (error) {
             alert(`Erreur lors du démarrage de la session : ${error.message}`);
         }
@@ -75,7 +77,7 @@ const AdminPanel = ({ contract, accounts }) => {
     const endSession = async () => {
         try {
             await contract.methods.endProposalsRegistration().send({ from: accounts[0] });
-            setIsSessionStarted(false);
+            setIsProposalSessionStarted(false);
         } catch (error) {
             alert(`Erreur lors de la fermeture de la session : ${error.message}`);
         }
@@ -90,6 +92,15 @@ const AdminPanel = ({ contract, accounts }) => {
         }
     };
 
+    const tallyVotes = async () => {
+        try {
+            await contract.methods.tallyVotes().send({from: accounts[0]});
+            setIsVotesTallied(true);
+        } catch (error) {
+            alert(`Erreur lors du décompte des votes : ${error.message}`);
+        }
+    };
+
     const getVotes = async () => {
         if (contract) {
             const fetchedVotes = [];
@@ -98,16 +109,6 @@ const AdminPanel = ({ contract, accounts }) => {
                 fetchedVotes.push(count);
             }
             setVotes(fetchedVotes);
-        }
-    };
-
-    const vote = async (proposalIndex) => {
-        try {
-            await contract.methods.vote(proposalIndex).send({ from: accounts[0] });
-            alert("Vote enregistré avec succès !");
-            getVotes();
-        } catch (error) {
-            alert(`Erreur lors de l'enregistrement du vote : ${error.message}`);
         }
     };
 
@@ -131,31 +132,9 @@ const AdminPanel = ({ contract, accounts }) => {
         }
     };
 
-
-    const calculateWinner = async () => {
-        try {
-            const currentStatus = await contract.methods.getStatus().call();
-            if (currentStatus !== "5") {
-                alert("Les votes n'ont pas encore été comptabilisés.");
-                return;
-            }
-
-            const winnerProposalId = await contract.methods.getWinner().call();
-            const winnerProposal = proposals[winnerProposalId];
-            alert(`La proposition gagnante est : ${winnerProposal.description} avec ${winnerProposal.voteCount} votes.`);
-        } catch (error) {
-            alert(`Erreur lors du calcul de la proposition gagnante : ${error.message}`);
-        }
-    };
-
     const showResult = async () => {
+        await tallyVotes();
         try {
-            const currentStatus = await contract.methods.getStatus().call();
-            if (currentStatus !== "5") {
-                alert("Les votes n'ont pas encore été comptabilisés.");
-                return;
-            }
-
             const winnerProposalId = await contract.methods.getWinner().call();
             const winnerProposal = proposals[winnerProposalId];
             setWinner(winnerProposal);
@@ -191,16 +170,19 @@ const AdminPanel = ({ contract, accounts }) => {
     }, [contract]);
 
     useEffect(() => {
-        const checkSessionStatus = async () => {
+        const checkStatus = async () => {
             if (contract) {
                 const status = await contract.methods.getStatus().call();
-                setIsSessionStarted(status === "1");
+                setIsRegisteringVoters(status === "0");
+                setIsProposalSessionStarted(status === "1");
                 setIsProposalSessionEnded(status === "2");
                 setIsVotingSessionStarted(status === "3");
+                setIsVotingSessionEnded(status=== "4");
+                setIsVotesTallied(status === "5");
             }
         };
 
-        checkSessionStatus();
+        checkStatus();
     }, [contract]);
 
     useEffect(() => {
@@ -250,16 +232,12 @@ const AdminPanel = ({ contract, accounts }) => {
     return (
         <div>
             <h2>Panel Admin</h2>
+            {isRegisteringVoters && (
             <div>
                 <h3>Enregistrer un votant</h3>
                 <input type="text" value={voterAddress} onChange={handleVoterAddressChange} />
                 <button onClick={registerVoter}>Enregistrer</button>
             </div>
-            {voterList.length >= 2 && !isSessionStarted && !isFetchingVoters && (
-                <div>
-                    <h3>Démarrer une session de vote</h3>
-                    <button onClick={startSession}>Démarrer</button>
-                </div>
             )}
             <div>
                 <h3>Liste des votants</h3>
@@ -267,17 +245,22 @@ const AdminPanel = ({ contract, accounts }) => {
                     {voterList.map((address) => (
                         <li key={address}>
                             {address}{" "}
-                            <button onClick={() => removeVoter(address)}>Supprimer</button>
+                            {isRegisteringVoters && (
+                                <button onClick={() => removeVoter(address)}>Supprimer</button>
+                            )}
                         </li>
                     ))}
                 </ul>
             </div>
-            {isSessionStarted && (
+            {voterList.length >= 2 && isRegisteringVoters && !isFetchingVoters && !isProposalSessionStarted && (
+                <div>
+                    <h3>Démarrer une session de de propositions</h3>
+                    <button onClick={startSession}>Démarrer</button>
+                </div>
+            )}
+            {isProposalSessionStarted && (
                 <div>
                     <h3>Session de proposition en cours</h3>
-                    <button onClick={endSessionWithConfirmation}>
-                        Terminer la session
-                    </button>
                     <h4>Liste des propositions</h4>
                     <ul>
                         {proposals.map((proposal, index) => (
@@ -287,9 +270,12 @@ const AdminPanel = ({ contract, accounts }) => {
                     {finishedVoters === voterList.length && (
                         <p>Tout le monde a fini de faire des propositions !</p>
                     )}
+                    <button onClick={endSessionWithConfirmation} disabled={proposals.length < 2}>
+                        Terminer la session
+                    </button>
                 </div>
             )}
-            {!isSessionStarted && isProposalSessionEnded && (
+            {isProposalSessionEnded && (
                 <div>
                     <h3>Ouvrir la session de vote</h3>
                     <button onClick={startVotingSession}>Ouvrir la session</button>
@@ -303,19 +289,15 @@ const AdminPanel = ({ contract, accounts }) => {
                         {proposals.map((proposal, index) => (
                             <li key={index}>
                                 {proposal.description} ({votes[index]} votes){" "}
-                                <button onClick={() => vote(index)}>Voter pour cette proposition</button>
                             </li>
                         ))}
                     </ul>
                 </div>
             )}
-            {isVotingSessionStarted && (
+            {isVotingSessionStarted && hasEveryoneVoted && (
                 <button onClick={endVotingSession}>Terminer la session de vote</button>
             )}
-            {hasEveryoneVoted && (
-                <button onClick={calculateWinner}>Calculer la proposition gagnante</button>
-            )}
-            {!isVotingSessionStarted && hasEveryoneVoted && (
+            {isVotesTallied && (
                 <div>
                     <h3>Afficher le résultat</h3>
                     <button onClick={showResult}>Afficher le résultat</button>

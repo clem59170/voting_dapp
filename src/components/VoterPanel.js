@@ -2,13 +2,18 @@ import React, { useEffect, useState } from "react";
 
 const VoterPanel = ({ contract, accounts }) => {
     const [isRegistered, setIsRegistered] = useState(false);
-    const [isSessionStarted, setIsSessionStarted] = useState(false);
+    const [isProposalSessionStarted, setIsProposalSessionStarted] = useState(false);
+    const [isProposalSessionEnded, setIsProposalSessionEnded] = useState(false);
     const [proposal, setProposal] = useState("");
     const [hasFinishedProposals, setHasFinishedProposals] = useState(false);
     const [proposals, setProposals] = useState([]);
     const [isVotingSessionStarted, setIsVotingSessionStarted] = useState(false);
+    const [isVotingSessionEnded, setIsVotingSessionEnded] = useState(false);
     const [hasVoted, setHasVoted] = useState(false);
-    const [userVoteCount, setUserVoteCount] = useState(0);
+    const [isVotesTallied, setIsVotesTallied] = useState(false);
+    const [isRegisteringVoters, setIsRegisteringVoters] = useState(false)
+    const [winner, setWinner] = useState(null);
+
 
 
     const handleProposalChange = (event) => {
@@ -39,25 +44,49 @@ const VoterPanel = ({ contract, accounts }) => {
         try {
             await contract.methods.vote(proposalIndex).send({ from: accounts[0] });
             alert("Vote enregistré avec succès !");
-            setUserVoteCount(userVoteCount + 1);
             setHasVoted(true);
         } catch (error) {
             alert(`Erreur lors de l'enregistrement du vote : ${error.message}`);
         }
     };
+    const tallyVotes = async () => {
+        try {
+            await contract.methods.tallyVotes().send({from: accounts[0]});
+            setIsVotesTallied(true);
+        } catch (error) {
+            alert(`Erreur lors du décompte des votes : ${error.message}`);
+        }
+    };
 
+    const showResult = async () => {
+        await tallyVotes();
+        try {
+            const winnerProposalId = await contract.methods.getWinner().call();
+            const winnerProposal = proposals[winnerProposalId];
+            setWinner(winnerProposal);
+        } catch (error) {
+            alert(`Erreur lors de l'affichage du résultat : ${error.message}`);
+        }
+    };
     useEffect(() => {
-        const checkRegistrationStatus = async () => {
+        const checkStatus = async () => {
             if (contract) {
                 const voter = await contract.methods.voters(accounts[0]).call();
-                setIsRegistered(voter.isRegistered);
-                const sessionStatus = await contract.methods.status().call();
-                setIsSessionStarted(sessionStatus === "1");
                 const hasFinished = await contract.methods.hasFinishedProposals(accounts[0]).call();
+                const status = await contract.methods.getStatus().call();
+
+                setIsRegistered(voter.isRegistered);
+                setHasVoted(voter.hasVoted);
                 setHasFinishedProposals(hasFinished);
+                setIsRegisteringVoters(status === "0");
+                setIsProposalSessionStarted(status === "1");
+                setIsProposalSessionEnded(status === "2");
+                setIsVotingSessionStarted(status === "3");
+                setIsVotingSessionEnded(status=== "4");
+                setIsVotesTallied(status === "5");
             }
         };
-        checkRegistrationStatus();
+        checkStatus();
     }, [contract, accounts]);
 
     useEffect(() => {
@@ -71,30 +100,23 @@ const VoterPanel = ({ contract, accounts }) => {
         getProposals();
     }, [contract]);
 
-    useEffect(() => {
-        const checkVotingSessionStatus = async () => {
-            if (contract) {
-                const status = await contract.methods.getStatus().call();
-                setIsVotingSessionStarted(status === "3"); // Modifier cette ligne
-            }
-        };
-
-        checkVotingSessionStatus();
-    }, [contract]);
-
     return (
         <div>
-            {isRegistered ? (
-                <h1>Tu es sur la liste, tu vas pouvoir voter</h1>
+            {isRegisteringVoters ? (
+                isRegistered ? (
+                    <h1>Tu es sur la liste, tu vas pouvoir voter</h1>
+                ) : (
+                    <h1>Tu n'es pas sur la liste, tu pourras voter si l'admin t'ajoute</h1>
+                )
             ) : (
-                <h1>Tu n'es pas sur la liste, tu pourras voter si l'admin t'ajoute</h1>
+                <h1></h1>
             )}
-            {isRegistered && isSessionStarted && (
+            {isRegistered && isProposalSessionStarted && (
                 <div>
                     <h3>Faire une proposition</h3>
                     <input type="text" value={proposal} onChange={handleProposalChange} />
                     <button onClick={submitProposal} disabled={hasFinishedProposals}>Soumettre la proposition</button>
-                    <button onClick={finishProposals}>J'ai fini de faire des propositions</button>
+                    <button onClick={finishProposals} disabled={hasFinishedProposals}>J'ai fini de faire des propositions</button>
                 </div>
             )}
             {isRegistered && isVotingSessionStarted && (
@@ -105,21 +127,7 @@ const VoterPanel = ({ contract, accounts }) => {
                         {proposals.map((proposal, index) => (
                             <li key={index}>
                                 {proposal.description}{" "}
-                                <button onClick={() => vote(index)}>Voter pour cette proposition</button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-            {isRegistered && isVotingSessionStarted && (
-                <div>
-                    <h3>Session de vote en cours</h3>
-                    <h4>Liste des propositions</h4>
-                    <ul>
-                        {proposals.map((proposal, index) => (
-                            <li key={index}>
-                                {proposal.description}{" "}
-                                <button onClick={() => vote(index)}>Voter pour cette proposition</button>
+                                <button disabled={hasVoted} onClick={() => vote(index)}>Voter pour cette proposition</button>
                             </li>
                         ))}
                     </ul>
@@ -138,23 +146,27 @@ const VoterPanel = ({ contract, accounts }) => {
                     </ul>
                 </div>
             )}
-            {isRegistered && isVotingSessionStarted && (
+            {isRegistered && isVotingSessionStarted && hasVoted && (
                 <div>
                     <h3>Session de vote en cours</h3>
-                    {/* Affichez le nombre de votes de l'utilisateur */}
-                    <p>Vous avez voté {userVoteCount} fois.</p>
-                    <h4>Liste des propositions</h4>
-                    <ul>
-                        {proposals.map((proposal, index) => (
-                            <li key={index}>
-                                {proposal.description}{" "}
-                                <button onClick={() => vote(index)}>Voter pour cette proposition</button>
-                            </li>
-                        ))}
-                    </ul>
+                    <p>Vous avez voté !</p>
                 </div>
             )}
+            {isVotesTallied && (
+                <div>
+                    <h3>Afficher le résultat</h3>
+                    <button onClick={showResult}>Afficher le résultat</button>
+                    {winner && (
+                        <p>
+                            La proposition gagnante est : {winner.description} avec{" "}
+                            {winner.voteCount} votes.
+                        </p>
+                    )}
+                </div>
+            )}
+
         </div>
+
     );
 };
 
