@@ -57,17 +57,8 @@ const VoterPanel = ({ contract, accounts }) => {
             alert(`Erreur lors de l'enregistrement du vote : ${error.message}`);
         }
     };
-    const tallyVotes = async () => {
-        try {
-            await contract.methods.tallyVotes().send({from: accounts[0]});
-            setIsVotesTallied(true);
-        } catch (error) {
-            alert(`Erreur lors du décompte des votes : ${error.message}`);
-        }
-    };
 
     const showResult = async () => {
-        await tallyVotes();
         try {
             const winnerProposalId = await contract.methods.getWinner().call();
             const winnerProposal = proposals[winnerProposalId];

@@ -334,7 +334,7 @@ const AdminPanel = ({ contract, accounts }) => {
                         </Button>
                     </Card.Body>
                 )}
-                {isVotesTallied && (
+                {isVotingSessionEnded && (
                     <Card.Body>
                         <Card.Title>Afficher le résultat</Card.Title>
                         <Button onClick={showResult}>Afficher le résultat</Button>
