@@ -36,5 +36,5 @@ Une application de vote décentralisé construite avec un smart contract Ethereu
 
 1. Connectez-vous à Metamask et assurez-vous d'être sur le réseau Ganache.
 2. Accédez à l'application dans votre navigateur.
-3. Utilisez le panneau d'administration pour enregistrer des votants, démarrer une session de propositions, démarrer une session de vote et afficher les résultats.
-4. Utilisez le panneau de vote pour soumettre des propositions, voter et afficher les résultats.
+3. Utilisez le panneau d'administration en vous connectant via MetaMask au compte qui a servi au déploiement du contrat, pour enregistrer des votants, démarrer une session de propositions, démarrer une session de vote et afficher les résultats.
+4. Utilisez le panneau de vote en vous connectant via MetaMask aux comptes enregistrés dans la liste des votants par l'adminstrateur pour soumettre des propositions, voter et afficher les résultats.
