@@ -11,15 +11,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const VoterPanel = ({ contract, accounts }) => {
     const [isRegistered, setIsRegistered] = useState(false);
     const [isProposalSessionStarted, setIsProposalSessionStarted] = useState(false);
-    const [isProposalSessionEnded, setIsProposalSessionEnded] = useState(false);
     const [proposal, setProposal] = useState("");
     const [hasFinishedProposals, setHasFinishedProposals] = useState(false);
     const [proposals, setProposals] = useState([]);
     const [isVotingSessionStarted, setIsVotingSessionStarted] = useState(false);
-    const [isVotingSessionEnded, setIsVotingSessionEnded] = useState(false);
     const [hasVoted, setHasVoted] = useState(false);
     const [isVotesTallied, setIsVotesTallied] = useState(false);
-    const [isRegisteringVoters, setIsRegisteringVoters] = useState(false)
     const [winner, setWinner] = useState(null);
     const [selectedProposalIndex, setSelectedProposalIndex] = useState(null);
 
@@ -71,12 +68,11 @@ const VoterPanel = ({ contract, accounts }) => {
     useEffect(() => {
         const updateStatus = (status) => {
             console.log("status "+status);
-            setIsRegisteringVoters(status === "0");
+            //setIsRegisteringVoters(status === "0");
             setIsProposalSessionStarted(status === "1");
-            console.log("is proposal session started :"+isProposalSessionStarted);
-            setIsProposalSessionEnded(status === "2");
+            //setIsProposalSessionEnded(status === "2");
             setIsVotingSessionStarted(status === "3");
-            setIsVotingSessionEnded(status === "4");
+            //setIsVotingSessionEnded(status === "4");
             setIsVotesTallied(status === "5");
         };
 
