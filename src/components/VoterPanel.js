@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Container from 'react-bootstrap/Container';
-import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import ListGroup from 'react-bootstrap/ListGroup';
-import Alert from 'react-bootstrap/Alert';
-import Stack from 'react-bootstrap/Stack';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import {Container, Card, Button, Form, ListGroup, Alert, Stack} from 'react-bootstrap';
 
 const VoterPanel = ({ contract, accounts }) => {
     const [isRegistered, setIsRegistered] = useState(false);
