@@ -1,31 +1,40 @@
-# Charger le smart contract sur remix
+# Application de vote décentralisé
 
-Charger ce gist sur remix : https://gist.github.com/clem59170/9934f8868b68b524b32ced44662b3707
-Load from gist et vous copier coller le lien.
+Une application de vote décentralisé construite avec un smart contract Ethereum et un front-end React.
 
-# Lancer ganache et y connecter MetaMask
+## Prérequis
 
-Il faut lancer ganache et y connecter metamask sur le port sur lequel ganache sur lance par défaut 
+- Node.js et npm installés sur votre machine
+- Ganache
+- Remix IDE
 
-## Compiler Voting.sol
+## Bibliothèques et frameworks utilisés
 
-Sur Remix vous pouvez compiler le smart contract
+- React.js
+- React Bootstrap
+- Web3.js
 
-### Déployer le smart contract
+## Fichiers principaux
 
-Une fois compiler vous pouvez le déployer, en spécifiant utiliser ganache, la vous mettez l'adresse et le port sur lequel ganache est en écoute
+- `voting.sol` : le smart contract
+- `App.js` : le fichier principal de l'application React
+- `index.js` : point d'entrée de l'application
+- `adminPanel.js` : composant du panneau d'administration
+- `voterPanel.js` : composant du panneau de vote
 
+## Configuration et déploiement
 
-### Copier l'id du réseau et l'adresse du smart contract
+1. Clonez ce dépôt sur votre machine locale.
+2. Dans le dossier du projet, exécutez `npm install` pour installer les dépendances.
+3. Installez `react-bootstrap` et `bootstrap` en exécutant `npm install react-bootstrap bootstrap`.
+4. Importez le smart contract grace au gist : https://gist.github.com/clem59170/9934f8868b68b524b32ced44662b3707
+5. Déployez le smart contract sur Ganache en utilisant Remix IDE.
+6. Mettez à jour l'adresse du contrat, l'ID du réseau et l'ABI dans le fichier `voting.json` avec les informations fournies par Remix IDE après le déploiement du contrat.
+7. Exécutez `npm start` pour démarrer l'application React en local. L'application s'ouvrira dans votre navigateur à l'adresse `http://localhost:3000`.
 
-Lorsque vous déployez le smart contract il se déploie à une adresse particulière, sur remix vous pouvez facilement copier cette adresse, elle se site juste en dessous du bouton déployer. Vous devez coller cette adresse dans le fichier src/contracts/Voting.json à la place de l'adresse qui s'y trouve déjà. Pareil pour l'id du réseau, que vous pouvez trouver aussi sur remix au niveau du choix de l'environnement, normalement il est noté network id {}. Vous devez le copier et le coller a la place de l'id deja présent dans le fichier Voting.json
+## Utilisation de l'application
 
-### npm start
-
-Dans le répertoire src de l'application react, vous pouvez lancer npm start, si des erreurs de compilations surviennent, c'est surement un problème de dépendance, il faudra insaller les librairies qu'il vous manque avec npm (web3 etc)
-
-### Ce que fait cette app react
-
-Vous pouvez vous y identifier avec metamask, si vous vous identifier avec le compte qui a servi au déploiement du contrat, alors vous serez admin vous aurez l'interface admin, sinon l'interface utilisateur.
-
-L'admin peut ajouter des comptes pour qu'ils deviennent votant. Il peut ensuite lancer une session de propositions. Les votants font de propositions et l'admin décide de quand terminer cette session. Une dois terminée il peut lancer la session de vote, les votants votent pour leur proposition préféré, une fois qu'il ont voté ils sont informés des résulats avec le score de chaque proposition. L'admin lui est informé en temps réel du score de chaque proposition. Il peut ensuite décider de terminer la session de vote.
+1. Connectez-vous à Metamask et assurez-vous d'être sur le réseau Ganache.
+2. Accédez à l'application dans votre navigateur.
+3. Utilisez le panneau d'administration en vous connectant via MetaMask au compte qui a servi au déploiement du contrat, pour enregistrer des votants, démarrer une session de propositions, démarrer une session de vote et afficher les résultats.
+4. Utilisez le panneau de vote en vous connectant via MetaMask aux comptes enregistrés dans la liste des votants par l'adminstrateur pour soumettre des propositions, voter et afficher les résultats.
