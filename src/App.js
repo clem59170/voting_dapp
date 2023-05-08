@@ -4,6 +4,7 @@ import VotingContract from "./contracts/Voting.json";
 import AdminPanel from "./components/AdminPanel";
 import VoterPanel from "./components/VoterPanel";
 import "./App.css";
+import Button from "react-bootstrap/Button";
 
 const App = () => {
     const [web3, setWeb3] = useState(null);
@@ -51,7 +52,7 @@ const App = () => {
     return (
         <div className="App">
             {!web3 ? (
-                <button onClick={connectMetamask}>Connecter Metamask</button>
+                <Button onClick={connectMetamask}>Connecter Metamask</Button>
             ) : isAdmin ? (
                 <AdminPanel contract={contract} accounts={accounts}/>
             ) : (
