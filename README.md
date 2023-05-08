@@ -42,7 +42,7 @@ Une application de vote décentralisé construite avec un smart contract Ethereu
 ### Répartition des tâches entre les coéquipiers 
 
 - Réalisation du smart contract : Clément Rafa
-- Setup de l'environnement de travail (Remix, Ganache) : Clément Rafa
+- Setup de l'environnement de travail (Remix, Ganache, web3, react et bootstrap) : Clément Rafa et Antoine Chauvin
 - Interaction du smart contract avec le front react : Clément Rafa et Antoine Chauvin
 - Desigin de l'UI avec bootstrap : Clément Rafa et Antoine Chauvin
 - Réalisation des tests unitaires : Amélie Sabine, Florian Jardez et Ugo Ogliarogo
