@@ -21,6 +21,7 @@ const VoterPanel = ({ contract, accounts }) => {
     const [isVotesTallied, setIsVotesTallied] = useState(false);
     const [isRegisteringVoters, setIsRegisteringVoters] = useState(false)
     const [winner, setWinner] = useState(null);
+    const [selectedProposalIndex, setSelectedProposalIndex] = useState(null);
 
 
 
@@ -68,25 +69,84 @@ const VoterPanel = ({ contract, accounts }) => {
         }
     };
     useEffect(() => {
-        const checkStatus = async () => {
+        const updateStatus = (status) => {
+            console.log("status "+status);
+            setIsRegisteringVoters(status === "0");
+            setIsProposalSessionStarted(status === "1");
+            console.log("is proposal session started :"+isProposalSessionStarted);
+            setIsProposalSessionEnded(status === "2");
+            setIsVotingSessionStarted(status === "3");
+            setIsVotingSessionEnded(status === "4");
+            setIsVotesTallied(status === "5");
+        };
+
+        const fetchStatus = async () => {
             if (contract) {
                 const voter = await contract.methods.voters(accounts[0]).call();
                 const hasFinished = await contract.methods.hasFinishedProposals(accounts[0]).call();
                 const status = await contract.methods.getStatus().call();
 
+                console.log(voter, hasFinished, status);
+
                 setIsRegistered(voter.isRegistered);
                 setHasVoted(voter.hasVoted);
                 setHasFinishedProposals(hasFinished);
-                setIsRegisteringVoters(status === "0");
-                setIsProposalSessionStarted(status === "1");
-                setIsProposalSessionEnded(status === "2");
-                setIsVotingSessionStarted(status === "3");
-                setIsVotingSessionEnded(status=== "4");
-                setIsVotesTallied(status === "5");
+                updateStatus(status);
             }
         };
+
+        const checkStatus = async () => {
+            if (contract) {
+                const statusSubscription = contract.events.WorkflowStatusChange({}, (error, evt) => {
+                    if (error) {
+                        alert("Erreur lors du changement de status");
+                    } else {
+                        const status = evt.returnValues.newStatus;
+                        updateStatus(status);
+                    }
+                });
+
+                const voterRegisteredSubscription = contract.events.VoterRegistered({ filter: { voterAddress: accounts[0] } }, () => {
+                    setIsRegistered(true);
+                });
+
+                const voterRemovedSubscription = contract.events.VoterRemoved({ filter: { voter: accounts[0] } }, () => {
+                    setIsRegistered(false);
+                });
+
+                const votedSubscription = contract.events.Voted({}, (error, evt) => {
+                    if (!error) {
+                        const votedVoter = evt.returnValues.voter;
+                        const votedProposalId = evt.returnValues.proposalId;
+
+                        // Mettre à jour hasVoted si l'utilisateur actuel a voté
+                        if (accounts[0] === votedVoter) {
+                            setHasVoted(true);
+                        }
+
+                        // Mettre à jour les résultats des votes
+                        setProposals(prevProposals => prevProposals.map((proposal, index) => {
+                            if (index === parseInt(votedProposalId, 10)) {
+                                return { ...proposal, voteCount: parseInt(proposal.voteCount, 10) + 1 };
+                            }
+                            return proposal;
+                        }));
+                    }
+                });
+
+                return () => {
+                    statusSubscription.unsubscribe();
+                    voterRegisteredSubscription.unsubscribe();
+                    voterRemovedSubscription.unsubscribe();
+                    votedSubscription.unsubscribe();
+                };
+            }
+        };
+
+        fetchStatus();
         checkStatus();
     }, [contract, accounts]);
+
 
     useEffect(() => {
         const getProposals = async () => {
@@ -99,21 +159,13 @@ const VoterPanel = ({ contract, accounts }) => {
         getProposals();
     }, [contract]);
 
+    useEffect(() => {
+        console.log("is registered:", isRegistered, "is proposal session started:", isProposalSessionStarted);
+    }, [isRegistered, isProposalSessionStarted]);
+
+
     return (
         <Container>
-            {isRegisteringVoters ? (
-                isRegistered ? (
-                    <Alert variant="success">
-                        Tu es sur la liste, tu vas pouvoir voter
-                    </Alert>
-                ) : (
-                    <Alert variant="danger">
-                        Tu n'es pas sur la liste, tu pourras voter si l'admin t'ajoute
-                    </Alert>
-                )
-            ) : (
-                <></>
-            )}
             {isRegistered && isProposalSessionStarted && (
                 <Card>
                     <Card.Header>Faire une proposition</Card.Header>
@@ -148,16 +200,23 @@ const VoterPanel = ({ contract, accounts }) => {
                         <ListGroup>
                             {proposals.map((proposal, index) => (
                                 <ListGroup.Item key={index}>
-                                    {proposal.description}{" "}
-                                    <Button
+                                    <Form.Check
+                                        type="radio"
+                                        name="proposal"
+                                        label={proposal.description}
+                                        onChange={() => setSelectedProposalIndex(index)}
+                                        checked={selectedProposalIndex === index}
                                         disabled={hasVoted}
-                                        onClick={() => vote(index)}
-                                    >
-                                        Voter pour cette proposition
-                                    </Button>
+                                    />
                                 </ListGroup.Item>
                             ))}
                         </ListGroup>
+                        <Button
+                            disabled={hasVoted || selectedProposalIndex === null}
+                            onClick={() => vote(selectedProposalIndex)}
+                        >
+                            Voter
+                        </Button>
                     </Card.Body>
                 </Card>
             )}
@@ -184,7 +243,7 @@ const VoterPanel = ({ contract, accounts }) => {
                     </Card.Body>
                 </Card>
             )}
-            {isVotesTallied && (
+            {isVotesTallied && isRegistered && (
                 <Card>
                     <Card.Header>Afficher le résultat</Card.Header>
                     <Card.Body>

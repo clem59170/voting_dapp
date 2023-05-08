@@ -28,7 +28,6 @@ const AdminPanel = ({ contract, accounts }) => {
 
 
     const endSessionWithConfirmation = async () => {
-        setIsProposalSessionEnded(true)
         if (finishedVoters < voterList.length) {
             if (
                 window.confirm(
@@ -77,7 +76,7 @@ const AdminPanel = ({ contract, accounts }) => {
     const startSession = async () => {
         try {
             await contract.methods.startProposalsRegistration().send({ from: accounts[0] });
-            setIsProposalSessionStarted(true);
+            //setIsProposalSessionStarted(true);
         } catch (error) {
             alert(`Erreur lors du démarrage de la session : ${error.message}`);
         }
@@ -86,7 +85,7 @@ const AdminPanel = ({ contract, accounts }) => {
     const endSession = async () => {
         try {
             await contract.methods.endProposalsRegistration().send({ from: accounts[0] });
-            setIsProposalSessionStarted(false);
+            //setIsProposalSessionEnded(true);
         } catch (error) {
             alert(`Erreur lors de la fermeture de la session : ${error.message}`);
         }
@@ -95,7 +94,7 @@ const AdminPanel = ({ contract, accounts }) => {
     const startVotingSession = async () => {
         try {
             await contract.methods.startVotingSession().send({ from: accounts[0] });
-            setIsVotingSessionStarted(true);
+            //setIsVotingSessionStarted(true);
         } catch (error) {
             alert(`Erreur lors du démarrage de la session de vote : ${error.message}`);
         }
@@ -104,9 +103,23 @@ const AdminPanel = ({ contract, accounts }) => {
     const tallyVotes = async () => {
         try {
             await contract.methods.tallyVotes().send({from: accounts[0]});
-            setIsVotesTallied(true);
+            // setIsVotesTallied(true);
         } catch (error) {
             alert(`Erreur lors du décompte des votes : ${error.message}`);
+        }
+    };
+
+    const resetStatus = async () => {
+        try {
+            await contract.methods.resetStatus().send({from: accounts[0]});
+            // setIsRegisteringVoters(true);
+            // setIsVotingSessionEnded(false);
+            // setIsProposalSessionEnded(false);
+            // setIsVotingSessionStarted(false);
+            // setIsVotesTallied(false);
+            // setIsProposalSessionStarted(false);
+        } catch (error) {
+            alert(`Erreur lors du reset du status : ${error.message}`);
         }
     };
 
@@ -130,6 +143,7 @@ const AdminPanel = ({ contract, accounts }) => {
             }
 
             await contract.methods.endVotingSession().send({ from: accounts[0] });
+            //setIsVotingSessionEnded(true)
             const updatedStatus = await contract.methods.getStatus().call();
             if (updatedStatus === "4") {
                 alert("Session de vote terminée !");
@@ -179,18 +193,39 @@ const AdminPanel = ({ contract, accounts }) => {
     }, [contract]);
 
     useEffect(() => {
-        const checkStatus = async () => {
+        const fetchStatus = async () => {
             if (contract) {
-                const status = await contract.methods.getStatus().call();
-                setIsRegisteringVoters(status === "0");
-                setIsProposalSessionStarted(status === "1");
-                setIsProposalSessionEnded(status === "2");
-                setIsVotingSessionStarted(status === "3");
-                setIsVotingSessionEnded(status=== "4");
-                setIsVotesTallied(status === "5");
+                const currentStatus = await contract.methods.getStatus().call();
+                updateStatus(currentStatus);
             }
         };
 
+        const updateStatus = (status) => {
+            setIsRegisteringVoters(status === "0");
+            setIsProposalSessionStarted(status === "1");
+            setIsProposalSessionEnded(status === "2");
+            setIsVotingSessionStarted(status === "3");
+            setIsVotingSessionEnded(status === "4");
+            setIsVotesTallied(status === "5");
+        };
+
+        const checkStatus = async () => {
+            if (contract) {
+                const subscription = contract.events.WorkflowStatusChange({}, (error, evt) => {
+                    if (error) {
+                        alert("Erreur lors du changement de status");
+                    } else {
+                        const status = evt.returnValues.newStatus;
+                        updateStatus(status);
+                    }
+                });
+                return () => {
+                    subscription.unsubscribe();
+                };
+            }
+        };
+
+        fetchStatus();
         checkStatus();
     }, [contract]);
 
@@ -281,7 +316,7 @@ const AdminPanel = ({ contract, accounts }) => {
                     !isProposalSessionStarted && (
                         <Card.Body>
                             <Card.Title>Démarrer une session de propositions</Card.Title>
-                            <Button onClick={startSession}>Démarrer</Button>
+                            <Button disabled={isProposalSessionStarted} onClick={startSession}>Démarrer</Button>
                         </Card.Body>
                     )}
                 {isProposalSessionStarted && (
@@ -338,13 +373,21 @@ const AdminPanel = ({ contract, accounts }) => {
                     <Card.Body>
                         <Card.Title>Afficher le résultat</Card.Title>
                         <Button onClick={showResult}>Afficher le résultat</Button>
-                        {winner && (
+                        {winner &&(
                             <p>
                                 La proposition gagnante est : {winner.description} avec{" "}
                                 {winner.voteCount} votes.
                             </p>
                         )}
                     </Card.Body>
+                )}
+                {isVotesTallied && (
+                    <Card.Body>
+                        <Button onClick={resetStatus}>
+                        reset
+                    </Button>
+                    </Card.Body>
+
                 )}
             </Card>
         </Container>

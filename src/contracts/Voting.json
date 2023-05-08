@@ -165,7 +165,7 @@
 		},
 		{
 			"inputs": [],
-			"name": "reset",
+			"name": "resetStatus",
 			"outputs": [],
 			"stateMutability": "nonpayable",
 			"type": "function"
@@ -446,7 +446,7 @@
 	],
 	"networks": {
 		"5777": {
-			"address": "0xBCF11f6D79d20b2e9068015eB56879F8901c647a"
+			"address": "0x52c58bBE7d44a7086B9466C19642830B330c6613"
 		}
 	}
 }
