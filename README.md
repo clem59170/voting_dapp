@@ -38,3 +38,11 @@ Une application de vote décentralisé construite avec un smart contract Ethereu
 2. Accédez à l'application dans votre navigateur.
 3. Utilisez le panneau d'administration en vous connectant via MetaMask au compte qui a servi au déploiement du contrat, pour enregistrer des votants, démarrer une session de propositions, démarrer une session de vote et afficher les résultats.
 4. Utilisez le panneau de vote en vous connectant via MetaMask aux comptes enregistrés dans la liste des votants par l'adminstrateur pour soumettre des propositions, voter et afficher les résultats.
+
+### Répartition des tâches entre les coéquipiers 
+
+Réalisation du smart contract : Clément Rafa
+Setup de l'environnement de travail (Remix, Ganache) : Clément Rafa
+Interaction du smart contract avec le front react : Clément Rafa et Antoine Chauvin
+Desigin de l'UI avec bootstrap : Clément Rafa et Antoine Chauvin
+Réalisation des tests unitaires : Amélie Sabine, Florian Jardez et Ugo Ogliarogo
