@@ -33,11 +33,12 @@ Une application de vote décentralisé construite avec un smart contract Ethereu
 
 ```
 {
-  "networks": {
-    "5777": { //ici c'est l'id du réseau que vous pouvez modifier s'il est différent pour vous
-      "address": "0x52c58bBE7d44a7086B9466C19642830B330c6613" //ici vous devez forcément changer, l'adresse ne sera pas la m
-    }
-  }
+"abi": [...], //Si vous modifier le smart contract et que vous voulez appliquer ces changements, il faudra donc recompiler et copier-coller l'ABI du contrat ici, vous le toruverez sur Remix sur la page de compilation
+	"networks": {
+		"5777": { //ID du réseau Ganache, à changer s'il diffère pour vous, vous vous pouvez le voir directement sur ganache, ou sur Remix sur la page de déploiement
+			"address": "0x52c58bBE7d44a7086B9466C19642830B330c6613" //Adresse du contrat déployé sur Ganache, à changer absolument, vous le trouverez sur Remix à la page de déploiement
+		}
+	}
 }
 ```
 7. Exécutez `npm start` pour démarrer l'application React en local. L'application s'ouvrira dans votre navigateur à l'adresse `http://localhost:3000`.
