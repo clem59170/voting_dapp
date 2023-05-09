@@ -130,6 +130,7 @@ const AdminPanel = ({ contract, accounts }) => {
 
     const endVotingSession = async () => {
         try {
+            //await tallyVotes();
             const currentStatus = await contract.methods.getStatus().call();
             if (currentStatus !== "3") {
                 alert("La session de vote n'a pas encore commencé.");
@@ -375,6 +376,14 @@ const AdminPanel = ({ contract, accounts }) => {
                         )}
                     </Card.Body>
                 )}
+                <Card.Body>
+                {winner &&(
+                    <p>
+                        La proposition gagnante est : {winner.description} avec{" "}
+                        {winner.voteCount} votes.
+                    </p>
+                )}
+                </Card.Body>
                 {isVotesTallied && (
                     <Card.Body>
                         <Button onClick={resetStatus}>
