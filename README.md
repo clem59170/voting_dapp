@@ -29,7 +29,17 @@ Une application de vote décentralisé construite avec un smart contract Ethereu
 3. Installez `react-bootstrap` et `bootstrap` en exécutant `npm install react-bootstrap bootstrap`.
 4. Importez le smart contract grace au gist : https://gist.github.com/clem59170/9934f8868b68b524b32ced44662b3707
 5. Déployez le smart contract sur Ganache en utilisant Remix IDE.
-6. Mettez à jour l'adresse du contrat, l'ID du réseau et l'ABI dans le fichier `voting.json` avec les informations fournies par Remix IDE après le déploiement du contrat.
+6. Mettez à jour l'adresse du contrat, l'ID du réseau et l'ABI dans le fichier `src/contracts/Voting.json` avec les informations fournies par Remix IDE après le déploiement du contrat :
+
+\```
+{
+  "networks": {
+    "5777": { //ici c'est l'id du réseau que vous pouvez modifier s'il est différent pour vous
+      "address": "0x52c58bBE7d44a7086B9466C19642830B330c6613" //ici vous devez forcément changer, l'adresse ne sera pas la m
+    }
+  }
+}
+\```
 7. Exécutez `npm start` pour démarrer l'application React en local. L'application s'ouvrira dans votre navigateur à l'adresse `http://localhost:3000`.
 
 ## Utilisation de l'application
